@@ -1,0 +1,6206 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="description" content="مختبر باي: احسب π حتى 10 ملايين خانة، ابحث داخلها، وحوّلها إلى أحرف أو بكسلات.">
+<meta name="theme-color" content="#090909">
+<meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap">
+
+<title>π | مختبر باي</title>
+
+<style>
+
+
+:root {
+    --gold: #e5bd65;
+    --gold-dark: #a77b2c;
+    --bg: #090909;
+    --panel: #11110f;
+    --line: #302719;
+    --muted: #a8a095;
+    --font: Cairo, Tahoma, 'Segoe UI', Arial, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+
+    background:
+        radial-gradient(
+            ellipse at top,
+            #211a0e 0%,
+            #090909 48%
+        );
+
+    color: #f6f1e7;
+    font-family: var(--font);
+}
+
+header {
+    padding: 26px 7%;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    border-bottom: 1px solid #ffffff12;
+}
+
+.brand {
+    color: var(--gold);
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+.brand span {
+    margin-left: 8px;
+
+    font-family: Georgia, serif;
+    font-size: 1.8rem;
+}
+
+.pill {
+    padding: 7px 14px;
+
+    border: 1px solid var(--line);
+    border-radius: 30px;
+
+    color: #d8c9a8;
+    font-size: 0.8rem;
+}
+
+main {
+    max-width: 1000px;
+
+    margin: auto;
+
+    padding: 65px 22px 45px;
+}
+
+.hero {
+    margin-bottom: 38px;
+
+    text-align: center;
+}
+
+.symbol {
+    color: var(--gold);
+
+    font:
+        clamp(5rem, 15vw, 9rem)/1
+        Georgia,
+        serif;
+
+    text-shadow:
+        0 0 45px #d9a83b2b;
+}
+
+h1 {
+    margin: 15px 0 8px;
+
+    font-size:
+        clamp(1.7rem, 5vw, 3rem);
+}
+
+h1 em {
+    color: var(--gold);
+    font-style: normal;
+}
+
+.sub {
+    max-width: 700px;
+
+    margin: 0 auto;
+
+    color: var(--muted);
+
+    line-height: 1.9;
+}
+
+.card {
+    padding: clamp(20px, 4vw, 36px);
+
+    background:
+        linear-gradient(
+            145deg,
+            #15140f,
+            #0e0e0d
+        );
+
+    border: 1px solid var(--line);
+    border-radius: 22px;
+
+    box-shadow:
+        0 20px 80px #0008;
+}
+
+label {
+    display: block;
+
+    margin-bottom: 12px;
+
+    color: #d7c7a4;
+
+    font-weight: 700;
+}
+
+.controls {
+    display: flex;
+
+    gap: 12px;
+
+    flex-wrap: wrap;
+}
+
+input,
+select {
+    flex: 1;
+
+    min-width: 150px;
+
+    padding: 15px;
+
+    background: #080808;
+
+    border: 1px solid #49391f;
+    border-radius: 12px;
+
+    color: white;
+
+    outline: none;
+
+    font: 600 1rem/1.4 var(--font);
+}
+
+input:focus,
+select:focus {
+    border-color: var(--gold);
+
+    box-shadow:
+        0 0 0 3px #e5bd6518;
+}
+
+button {
+    padding: 14px 23px;
+
+    border: none;
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f0d58a,
+            #b78a39
+        );
+
+    color: #171109;
+
+    cursor: pointer;
+
+    font: 800 1rem/1.4 var(--font);
+
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+
+    filter: brightness(1.08);
+}
+
+button:disabled {
+    opacity: 0.5;
+
+    cursor: wait;
+
+    transform: none;
+}
+
+.secondary {
+    background: #1b1914;
+
+    border: 1px solid #4b3b20;
+
+    color: var(--gold);
+}
+
+.note {
+    margin: 12px 0 0;
+
+    color: #8f887b;
+
+    font-size: 0.82rem;
+}
+
+.status {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin: 26px 0 12px;
+
+    color: var(--muted);
+
+    font-size: 0.9rem;
+}
+
+
+/* =========================
+   DISPLAY MODE
+========================= */
+
+.display-controls {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 25px;
+
+    padding: 16px;
+
+    background: #0a0a09;
+
+    border: 1px solid #49391f;
+
+    border-radius: 14px;
+}
+
+.display-controls label {
+    margin: 0;
+
+    white-space: nowrap;
+}
+
+.display-controls select {
+    max-width: 350px;
+}
+
+
+/* =========================
+   RESULT
+========================= */
+
+.result-shell {
+    margin-top: 0;
+
+    position: relative;
+}
+
+.result {
+    direction: ltr;
+
+    min-height: 150px;
+    max-height: 330px;
+
+    padding: 20px;
+
+    overflow: auto;
+
+    background: #080808;
+
+    border: 1px solid #29251d;
+    border-radius: 14px;
+
+    color: #ead8a9;
+
+    text-align: left;
+
+    font:
+        clamp(.95rem, 2.5vw, 1.15rem)/2
+        'IBM Plex Mono',
+        monospace;
+
+    overflow-wrap: anywhere;
+
+    white-space: pre-wrap;
+}
+
+
+/* =========================
+   PIXELS
+========================= */
+
+.pixel-info {
+    margin-top: 12px;
+
+    padding: 12px 15px;
+
+    background: #0a0a09;
+
+    border: 1px solid #29251d;
+
+    border-radius: 12px;
+
+    color: var(--muted);
+
+    font-size: 0.82rem;
+
+    line-height: 1.8;
+}
+
+.pixel-viewport {
+    position: relative;
+
+    width: 100%;
+
+    min-height: 260px;
+    max-height: 500px;
+
+    overflow: auto;
+
+    direction: ltr;
+
+    background: #000;
+
+    border: 1px solid #29251d;
+
+    border-radius: 14px;
+}
+
+#pixelCanvas {
+    display: block;
+
+    max-width: none;
+    max-height: none;
+
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.pixel-marker,
+.shape-marker {
+    position: absolute;
+
+    pointer-events: none;
+
+    border: 2px solid var(--gold);
+
+    border-radius: 3px;
+
+    box-shadow:
+        0 0 0 2px #000,
+        0 0 14px #e5bd6599;
+
+    z-index: 5;
+
+    transform:
+        translate(
+            -50%,
+            -50%
+        );
+}
+
+.pixel-marker {
+    width: 16px;
+    height: 16px;
+}
+
+.shape-marker {
+    min-width: 16px;
+    min-height: 16px;
+}
+
+
+/* =========================
+   SHAPE SEARCH
+========================= */
+
+.shape-search {
+    margin-top: 18px;
+
+    padding: 20px;
+
+    background: #0a0a09;
+
+    border: 1px solid #49391f;
+
+    border-radius: 14px;
+}
+
+.shape-title {
+    margin: 0 0 6px;
+
+    color: var(--gold);
+
+    font-size: 1.1rem;
+
+    font-weight: 800;
+}
+
+.shape-description {
+    margin: 0 0 18px;
+
+    color: var(--muted);
+
+    font-size: 0.84rem;
+
+    line-height: 1.8;
+}
+
+.shape-editor {
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+
+    flex-wrap: wrap;
+}
+
+.shape-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, 28px);
+
+    grid-template-rows:
+        repeat(5, 28px);
+
+    gap: 3px;
+
+    padding: 6px;
+
+    background: #000;
+
+    border: 1px solid #49391f;
+
+    border-radius: 10px;
+
+    touch-action: none;
+
+    user-select: none;
+
+    -webkit-user-select: none;
+}
+
+.shape-cell {
+    width: 28px;
+    height: 28px;
+
+    background: #000;
+
+    border: 1px solid #29251d;
+
+    border-radius: 2px;
+
+    cursor: crosshair;
+
+    touch-action: none;
+
+    transition:
+        background 0.08s,
+        transform 0.08s;
+}
+
+.shape-cell.white {
+    background: #fff;
+
+    border-color: #fff;
+}
+
+.shape-cell:hover {
+    transform: scale(1.06);
+}
+
+.shape-actions {
+    display: flex;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+}
+
+.shape-status {
+    min-height: 30px;
+
+    margin-top: 14px;
+
+    color: var(--muted);
+
+    line-height: 1.8;
+
+    font-size: 0.84rem;
+}
+
+
+/* =========================
+   SEARCH
+========================= */
+
+.search-box {
+    margin-top: 25px;
+
+    padding: 20px;
+
+    background: #0a0a09;
+
+    border: 1px solid #49391f;
+
+    border-radius: 14px;
+}
+
+.search-box label {
+    margin-bottom: 12px;
+}
+
+#searchStatus {
+    min-height: 30px;
+
+    line-height: 1.8;
+}
+
+
+/* =========================
+   HIGHLIGHT
+========================= */
+
+mark {
+    padding: 2px 4px;
+
+    background: var(--gold);
+
+    border-radius: 4px;
+
+    color: #090909;
+
+    font-weight: bold;
+}
+
+
+/* =========================
+   ACTIONS
+========================= */
+
+.actions {
+    display: flex;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+
+    margin-top: 14px;
+}
+
+
+/* =========================
+   STATS
+========================= */
+
+.stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 12px;
+
+    margin-top: 20px;
+}
+
+.stat {
+    padding: 16px;
+
+    background: #0a0a09;
+
+    border: 1px solid #28231a;
+
+    border-radius: 14px;
+
+    text-align: center;
+}
+
+.stat strong {
+    display: block;
+
+    color: var(--gold);
+
+    font:
+        600 1.5rem
+        'IBM Plex Mono',
+        monospace;
+}
+
+.stat span {
+    color: var(--muted);
+
+    font-size: 0.8rem;
+}
+
+
+/* =========================
+   FOOTER
+========================= */
+
+footer {
+    padding: 20px;
+
+    color: #655f54;
+
+    font-size: 0.8rem;
+
+    text-align: center;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+    header {
+        padding: 18px 5%;
+    }
+
+    .controls button {
+        width: 100%;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .status {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .display-controls {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .display-controls select {
+        max-width: none;
+    }
+
+    .pixel-viewport {
+        max-height: 380px;
+    }
+
+    .shape-editor {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+}
+
+/* =========================
+   POLISH
+========================= */
+html { -webkit-text-size-adjust: 100%; }
+::selection { background: var(--gold); color: #090909; }
+button:active:not(:disabled) { transform: translateY(0); filter: brightness(.96); }
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+}
+.shape-cell:focus-visible { outline: 2px solid var(--gold); }
+.result, .pixel-viewport {
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold-dark) #000;
+}
+@media (hover: none) {
+    button:hover { transform: none; filter: none; }
+    .shape-cell:hover { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; scroll-behavior: auto !important; }
+}
+@media (max-width: 600px) {
+    .shape-grid { grid-template-columns: repeat(5, 44px); grid-template-rows: repeat(5, 44px); }
+    .shape-cell { width: 44px; height: 44px; }
+    .shape-actions button { flex: 1; }
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<header>
+
+    <div class="brand">
+        <span>π</span>
+        مختبر باي
+    </div>
+
+    <div class="pill">
+        حاسبة رياضية دقيقة
+    </div>
+
+</header>
+
+
+
+<main>
+
+
+<section class="hero">
+
+    <div class="symbol">
+        π
+    </div>
+
+    <h1>
+        اكتشف عالم <em>باي</em>
+    </h1>
+
+    <p class="sub">
+        احسب الخانات العشرية للعدد π حتى 10 ملايين خانة،
+        وابحث داخل الأرقام أو الأحرف، أو حوّل قيمة π إلى
+        بكسلات، وابحث عن أقرب شكل مشابه ترسمه.
+    </p>
+
+</section>
+
+
+
+<section class="card">
+
+
+<!-- =========================
+     CALCULATOR
+========================= -->
+
+<label for="digits">
+    كم خانة عشرية تريد حسابها؟
+</label>
+
+
+<div class="controls">
+
+    <input
+        id="digits"
+        type="number"
+        min="1"
+        max="10000000"
+        value="100"
+        placeholder="عدد الخانات (1 - 10,000,000)"
+    >
+
+    <button id="calculate">
+        احسب π الآن
+    </button>
+
+</div>
+
+
+<p class="note">
+    الحد الأقصى 10,000,000 خانة عشرية.
+    الأعداد الكبيرة جدًا تحتاج وقتًا وذاكرة أكبر.
+</p>
+
+
+
+<!-- =========================
+     STATUS
+========================= -->
+
+<div class="status">
+
+    <span id="status" aria-live="polite">
+        القيمة التقريبية المعروفة
+    </span>
+
+    <span id="count">
+        50 خانة
+    </span>
+
+</div>
+
+
+
+<!-- =========================
+     DISPLAY MODE
+========================= -->
+
+<div class="display-controls">
+
+    <label for="displayMode">
+        عرض النتيجة:
+    </label>
+
+    <select id="displayMode">
+
+        <option value="numbers">
+            🔢 أرقام π
+        </option>
+
+        <option value="letters">
+            🔤 أحرف π
+        </option>
+
+        <option value="pixels">
+            🖼️ بكسلات أبيض وأسود
+        </option>
+
+    </select>
+
+</div>
+
+
+
+<!-- =========================
+     CONVERSION METHOD
+========================= -->
+
+<div
+    class="display-controls"
+    id="conversionOptions"
+    style="display:none;"
+>
+
+    <label for="conversionMethod">
+        طريقة التحويل:
+    </label>
+
+    <select id="conversionMethod">
+
+        <option value="pairs" selected>
+            كل رقمين → A-Z
+        </option>
+
+        <option value="direct">
+            0 = A ، 1 = B ... 9 = J
+        </option>
+
+        <option value="custom">
+            ترميز مخصص
+        </option>
+
+    </select>
+
+</div>
+
+
+
+<!-- =========================
+     CUSTOM MAPPING
+========================= -->
+
+<div
+    id="customMappingBox"
+    style="display:none; margin-top:15px;"
+>
+
+    <label for="customMapping">
+        الحروف المقابلة للأرقام 0 → 9
+    </label>
+
+    <input
+        id="customMapping"
+        type="text"
+        value="ABCDEFGHIJ"
+        maxlength="10"
+        placeholder="مثلاً: ZYXWVUTSRQ"
+    >
+
+    <p class="note">
+        اكتب 10 أحرف بالضبط، الأول للرقم 0
+        والأخير للرقم 9.
+    </p>
+
+</div>
+
+
+
+<!-- =========================
+     RESULT
+========================= -->
+
+<div class="result-shell">
+
+    <div
+        class="result"
+        id="result"
+    >3.14159265358979323846264338327950288419716939937510</div>
+
+
+    <div
+        class="pixel-viewport"
+        id="pixelViewport"
+        style="display:none;"
+    >
+
+        <canvas
+            id="pixelCanvas" role="img" aria-label="تمثيل أرقام π كبكسلات بيضاء وسوداء"
+        ></canvas>
+
+
+        <div
+            class="pixel-marker"
+            id="pixelMarker"
+            style="display:none;"
+        ></div>
+
+
+        <div
+            class="shape-marker"
+            id="shapeMarker"
+            style="display:none;"
+        ></div>
+
+    </div>
+
+
+    <div
+        class="pixel-info"
+        id="pixelInfo"
+        style="display:none;"
+    >
+
+        <strong>
+            طريقة رسم البكسلات:
+        </strong>
+
+        الرقم من 0 إلى 4 = أسود،
+        والرقم من 5 إلى 9 = أبيض.
+        كل رقم من π يمثل بكسلًا واحدًا.
+
+    </div>
+
+
+
+    <!-- =========================
+         SHAPE SEARCH
+    ========================= -->
+
+    <div
+        class="shape-search"
+        id="shapeSearch"
+        style="display:none;"
+    >
+
+        <h2 class="shape-title">
+            🔲 ابحث عن أقرب شكل داخل π
+        </h2>
+
+
+        <p class="shape-description">
+            ارسم شكلك داخل شبكة 5×5. الموقع يقارن
+            شكل البكسلات نفسه، وقرب البكسلات من بعضها،
+            ويجرب الدوران والانعكاس حتى يجد المنطقة
+            الأكثر شبهًا بالرسم.
+        </p>
+
+
+        <div class="shape-editor">
+
+
+            <div
+                class="shape-grid"
+                id="shapeGrid" role="group" aria-label="شبكة الرسم 5×5"
+            ></div>
+
+
+            <div class="shape-actions">
+
+                <button
+                    id="findShapeBtn"
+                >
+                    🔎 ابحث عن أقرب شكل
+                </button>
+
+
+                <button
+                    class="secondary"
+                    id="clearShapeBtn"
+                >
+                    مسح الرسم
+                </button>
+
+            </div>
+
+
+        </div>
+
+
+        <p class="note">
+            اسحب بالماوس أو بإصبعك للرسم.
+            الخلية البيضاء = بكسل أبيض،
+            والسوداء = بكسل أسود.
+        </p>
+
+
+        <div
+            class="shape-status"
+            id="shapeStatus" aria-live="polite"
+        >
+            ارسم الشكل الذي تريد البحث عنه.
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     SEARCH
+========================= -->
+
+<div class="search-box">
+
+    <label
+        for="searchNumber"
+        id="searchLabel"
+    >
+        🔎 ابحث عن أي رقم داخل باي
+    </label>
+
+
+    <div class="controls">
+
+        <input
+            id="searchNumber"
+            type="text"
+            inputmode="numeric"
+            placeholder="مثلاً: 123456"
+        >
+
+        <button id="searchBtn">
+            بحث
+        </button>
+
+    </div>
+
+
+    <p
+        class="note"
+        id="searchStatus" aria-live="polite"
+    >
+        اكتب أي تسلسل أرقام للبحث عنه
+        داخل الخانات المحسوبة.
+    </p>
+
+</div>
+
+
+
+<!-- =========================
+     ACTIONS
+========================= -->
+
+<div class="actions">
+
+    <button
+        class="secondary"
+        id="copy"
+    >
+        نسخ النتيجة
+    </button>
+
+
+    <button
+        class="secondary"
+        id="clear"
+    >
+        مسح
+    </button>
+
+</div>
+
+
+
+<!-- =========================
+     STATS
+========================= -->
+
+<div class="stats">
+
+
+    <div class="stat">
+
+        <strong id="statDigits">
+            50
+        </strong>
+
+        <span>
+            خانة معروضة حاليًا
+        </span>
+
+    </div>
+
+
+
+    <div class="stat">
+
+        <strong>
+            ∞
+        </strong>
+
+        <span>
+            عدد الخانات نظريًا
+        </span>
+
+    </div>
+
+
+
+    <div class="stat">
+
+        <strong>
+            π
+        </strong>
+
+        <span>
+            ثابت رياضي غير نسبي
+        </span>
+
+    </div>
+
+
+</div>
+
+
+</section>
+
+</main>
+
+
+
+<footer>
+
+    صُنع بحب الرياضيات • π لا ينتهي ولا يتكرر بنمط ثابت
+
+</footer>
+
+
+
+<script>
+
+
+/* =========================================
+   اختصار العناصر
+========================================= */
+
+const $ = id =>
+    document.getElementById(id);
+
+
+
+/* =========================================
+   القيمة الأصلية لـ π
+========================================= */
+
+let originalPi =
+    $('result').textContent;
+
+
+
+/* =========================================
+   Web Worker
+========================================= */
+
+let piWorker = null;
+
+
+
+/* =========================================
+   حالة البكسلات
+========================================= */
+
+let pixelRenderToken = 0;
+
+let pixelReady = false;
+
+let pixelColumns = 0;
+
+let pixelRows = 0;
+
+let currentPixelSize = 16;
+
+
+
+/* =========================================
+   حالة الرسم
+========================================= */
+
+const SHAPE_SIZE = 5;
+
+const shapeCells = [];
+
+let shapeDrawing = false;
+
+let shapeDrawValue = 1;
+
+
+
+/* =========================================
+   جدول Popcount
+========================================= */
+
+const POPCOUNT_TABLE =
+    new Uint8Array(
+        1 << 16
+    );
+
+
+for (
+    let i = 1;
+    i < POPCOUNT_TABLE.length;
+    i++
+) {
+
+    POPCOUNT_TABLE[i] =
+        POPCOUNT_TABLE[
+            i >> 1
+        ] +
+        (
+            i & 1
+        );
+
+}
+
+
+
+/* =========================================
+   Popcount
+========================================= */
+
+function popcount(
+    value
+) {
+
+    value =
+        value >>> 0;
+
+
+    return (
+        POPCOUNT_TABLE[
+            value &
+            0xFFFF
+        ] +
+        POPCOUNT_TABLE[
+            value >>> 16
+        ]
+    );
+
+}
+
+
+
+/* =========================================
+   تنظيف شكل الرسم
+========================================= */
+
+function getNormalizedShape() {
+
+    let minX =
+        SHAPE_SIZE;
+
+
+    let minY =
+        SHAPE_SIZE;
+
+
+    let maxX =
+        -1;
+
+
+    let maxY =
+        -1;
+
+
+    let whiteCount =
+        0;
+
+
+    for (
+        let y = 0;
+        y < SHAPE_SIZE;
+        y++
+    ) {
+
+        for (
+            let x = 0;
+            x < SHAPE_SIZE;
+            x++
+        ) {
+
+            const index =
+                y *
+                SHAPE_SIZE +
+                x;
+
+
+            const white =
+                shapeCells[index]
+                    .classList
+                    .contains(
+                        'white'
+                    );
+
+
+            if (
+                !white
+            ) {
+
+                continue;
+
+            }
+
+
+            whiteCount++;
+
+
+            minX =
+                Math.min(
+                    minX,
+                    x
+                );
+
+
+            minY =
+                Math.min(
+                    minY,
+                    y
+                );
+
+
+            maxX =
+                Math.max(
+                    maxX,
+                    x
+                );
+
+
+            maxY =
+                Math.max(
+                    maxY,
+                    y
+                );
+
+        }
+
+    }
+
+
+    /*
+       لا يوجد رسم.
+    */
+
+    if (
+        whiteCount === 0
+    ) {
+
+        return null;
+
+    }
+
+
+    const width =
+        maxX -
+        minX +
+        1;
+
+
+    const height =
+        maxY -
+        minY +
+        1;
+
+
+    const matrix =
+        new Array(
+            height
+        );
+
+
+    for (
+        let y = 0;
+        y < height;
+        y++
+    ) {
+
+        matrix[y] =
+            new Array(
+                width
+            )
+            .fill(0);
+
+    }
+
+
+    for (
+        let y = minY;
+        y <= maxY;
+        y++
+    ) {
+
+        for (
+            let x = minX;
+        x <= maxX;
+        x++
+        ) {
+
+            const index =
+                y *
+                SHAPE_SIZE +
+                x;
+
+
+            if (
+                shapeCells[index]
+                    .classList
+                    .contains(
+                        'white'
+                    )
+            ) {
+
+                matrix[
+                    y - minY
+                ][
+                    x - minX
+                ] = 1;
+
+            }
+
+        }
+
+    }
+
+
+    return {
+
+        width,
+
+        height,
+
+        matrix
+
+    };
+
+}
+
+
+
+/* =========================================
+   Matrix إلى Shape
+========================================= */
+
+function matrixToShape(
+    matrix
+) {
+
+    const height =
+        matrix.length;
+
+
+    const width =
+        matrix[0].length;
+
+
+    let mask =
+        0;
+
+
+    let whiteCount =
+        0;
+
+
+    for (
+        let y = 0;
+        y < height;
+        y++
+    ) {
+
+        for (
+            let x = 0;
+            x < width;
+            x++
+        ) {
+
+            const bit =
+                matrix[y][x]
+                    ? 1
+                    : 0;
+
+
+            mask =
+                (
+                    mask <<
+                    1
+                ) |
+                bit;
+
+
+            if (
+                bit
+            ) {
+
+                whiteCount++;
+
+            }
+
+        }
+
+    }
+
+
+    return {
+
+        width,
+
+        height,
+
+        mask,
+
+        whiteCount,
+
+        dilatedMask:
+            dilateMask1(
+                mask,
+                width,
+                height
+            )
+
+    };
+
+}
+
+
+
+/* =========================================
+   تدوير Matrix
+========================================= */
+
+function rotateMatrix(
+    matrix
+) {
+
+    const oldHeight =
+        matrix.length;
+
+
+    const oldWidth =
+        matrix[0].length;
+
+
+    const result =
+        new Array(
+            oldWidth
+        );
+
+
+    for (
+        let y = 0;
+        y < oldWidth;
+        y++
+    ) {
+
+        result[y] =
+            new Array(
+                oldHeight
+            )
+            .fill(0);
+
+    }
+
+
+    for (
+        let y = 0;
+        y < oldHeight;
+        y++
+    ) {
+
+        for (
+            let x = 0;
+            x < oldWidth;
+            x++
+        ) {
+
+            result[x][
+                oldHeight -
+                1 -
+                y
+            ] =
+                matrix[y][x];
+
+        }
+
+    }
+
+
+    return result;
+
+}
+
+
+
+/* =========================================
+   انعكاس أفقي
+========================================= */
+
+function mirrorMatrix(
+    matrix
+) {
+
+    const height =
+        matrix.length;
+
+
+    const width =
+        matrix[0].length;
+
+
+    const result =
+        new Array(
+            height
+        );
+
+
+    for (
+        let y = 0;
+        y < height;
+        y++
+    ) {
+
+        result[y] =
+            new Array(
+                width
+            );
+
+
+        for (
+            let x = 0;
+            x < width;
+            x++
+        ) {
+
+            result[y][x] =
+                matrix[y][
+                    width -
+                    1 -
+                    x
+                ];
+
+        }
+
+    }
+
+
+    return result;
+
+}
+
+
+
+/* =========================================
+   إنشاء جميع الاتجاهات
+========================================= */
+
+function getShapeVariants(
+    normalized
+) {
+
+    const variants = [];
+
+    const seen =
+        new Set();
+
+
+    let current =
+        normalized.matrix;
+
+
+    /*
+       الشكل الأصلي + 3 دورانات.
+    */
+
+    for (
+        let i = 0;
+        i < 4;
+        i++
+    ) {
+
+        const shape =
+            matrixToShape(
+                current
+            );
+
+
+        const key =
+            shape.width +
+            'x' +
+            shape.height +
+            ':' +
+            shape.mask;
+
+
+        if (
+            !seen.has(key)
+        ) {
+
+            seen.add(key);
+
+
+            variants.push({
+
+                ...shape,
+
+                name:
+                    (
+                        i *
+                        90
+                    ) +
+                    '°'
+
+            });
+
+        }
+
+
+        current =
+            rotateMatrix(
+                current
+            );
+
+    }
+
+
+    /*
+       الانعكاس + الدوران.
+    */
+
+    current =
+        mirrorMatrix(
+            normalized.matrix
+        );
+
+
+    for (
+        let i = 0;
+        i < 4;
+        i++
+    ) {
+
+        const shape =
+            matrixToShape(
+                current
+            );
+
+
+        const key =
+            shape.width +
+            'x' +
+            shape.height +
+            ':' +
+            shape.mask;
+
+
+        if (
+            !seen.has(key)
+        ) {
+
+            seen.add(key);
+
+
+            variants.push({
+
+                ...shape,
+
+                name:
+                    'انعكاس ' +
+                    (
+                        i *
+                        90
+                    ) +
+                    '°'
+
+            });
+
+        }
+
+
+        current =
+            rotateMatrix(
+                current
+            );
+
+    }
+
+
+    return variants;
+
+}
+
+
+
+/* =========================================
+   تكبير Mask بمقدار بكسل واحد
+========================================= */
+
+function dilateMask1(
+    mask,
+    width,
+    height
+) {
+
+    const maxRow =
+        (
+            1 <<
+            width
+        ) -
+        1;
+
+
+    const horizontal =
+        new Array(
+            height
+        );
+
+
+    /*
+       تكبير أفقي.
+    */
+
+    for (
+        let y = 0;
+        y < height;
+        y++
+    ) {
+
+        const shift =
+            (
+                height -
+                1 -
+                y
+            ) *
+            width;
+
+
+        const row =
+            (
+                mask >> shift
+            ) &
+            maxRow;
+
+
+        horizontal[y] =
+            (
+                row |
+                (
+                    (
+                        row <<
+                        1
+                    ) &
+                    maxRow
+                ) |
+                (
+                    row >>
+                    1
+                )
+            ) &
+            maxRow;
+
+    }
+
+
+    /*
+       تكبير عمودي.
+    */
+
+    let result =
+        0;
+
+
+    for (
+        let y = 0;
+        y < height;
+        y++
+    ) {
+
+        let row =
+            horizontal[y];
+
+
+        if (
+            y > 0
+        ) {
+
+            row |=
+                horizontal[
+                    y - 1
+                ];
+
+        }
+
+
+        if (
+            y <
+            height - 1
+        ) {
+
+            row |=
+                horizontal[
+                    y + 1
+                ];
+
+        }
+
+
+        result =
+            (
+                result <<
+                width
+            ) |
+            row;
+
+    }
+
+
+    return result >>> 0;
+
+}
+
+
+
+/* =========================================
+   كود Web Worker
+========================================= */
+
+const workerCode = `
+
+function integerSqrt(n) {
+
+    if (n < 0n) {
+
+        throw new Error(
+            'Square root of negative number'
+        );
+
+    }
+
+
+    if (n < 2n) {
+
+        return n;
+
+    }
+
+
+    const decimalExponent =
+        Number(
+            self.currentDigits || 1
+        );
+
+
+    const estimatedBits =
+        Math.ceil(
+            2 *
+            decimalExponent *
+            3.321928094887362 +
+            14
+        );
+
+
+    let x =
+        1n <<
+        BigInt(
+            Math.ceil(
+                estimatedBits / 2
+            ) + 3
+        );
+
+
+    while (true) {
+
+        const y =
+            (x + n / x) >> 1n;
+
+
+        if (y >= x) {
+
+            return x;
+
+        }
+
+
+        x = y;
+
+    }
+
+}
+
+
+const C3_OVER_24 =
+    10939058860032000n;
+
+
+function binarySplit(a, b) {
+
+    if (
+        b - a === 1
+    ) {
+
+        if (
+            a === 0
+        ) {
+
+            return {
+
+                P: 1n,
+
+                Q: 1n,
+
+                T: 13591409n
+
+            };
+
+        }
+
+
+        const k =
+            BigInt(a);
+
+
+        const P =
+            (6n * k - 5n) *
+            (2n * k - 1n) *
+            (6n * k - 1n);
+
+
+        const Q =
+            k *
+            k *
+            k *
+            C3_OVER_24;
+
+
+        let T =
+            P *
+            (
+                13591409n +
+                545140134n * k
+            );
+
+
+        if (
+            a % 2 === 1
+        ) {
+
+            T = -T;
+
+        }
+
+
+        return {
+
+            P,
+
+            Q,
+
+            T
+
+        };
+
+    }
+
+
+    const m =
+        (a + b) >> 1;
+
+
+    const left =
+        binarySplit(
+            a,
+            m
+        );
+
+
+    const right =
+        binarySplit(
+            m,
+            b
+        );
+
+
+    return {
+
+        P:
+            left.P *
+            right.P,
+
+        Q:
+            left.Q *
+            right.Q,
+
+        T:
+            left.T *
+            right.Q +
+            left.P *
+            right.T
+
+    };
+
+}
+
+
+
+function computePi(d) {
+
+    self.currentDigits =
+        d;
+
+
+    const terms =
+        Math.ceil(
+            d / 14
+        ) + 1;
+
+
+    const split =
+        binarySplit(
+            0,
+            terms
+        );
+
+
+    const Q =
+        split.Q;
+
+
+    const T =
+        split.T;
+
+
+    const radicand =
+        10005n *
+        (
+            10n **
+            BigInt(
+                2 * d
+            )
+        );
+
+
+    const sqrt =
+        integerSqrt(
+            radicand
+        );
+
+
+    const numerator =
+        426880n *
+        sqrt *
+        Q;
+
+
+    const rounded =
+        (
+            numerator +
+            T / 2n
+        ) /
+        T;
+
+
+    let s =
+        rounded.toString();
+
+
+    s =
+        s.padStart(
+            d + 1,
+            '0'
+        );
+
+
+    return (
+        s.slice(
+            0,
+            -d
+        ) +
+        '.' +
+        s.slice(
+            -d
+        )
+    );
+
+}
+
+
+
+self.onmessage =
+    function(event) {
+
+        try {
+
+            const d =
+                event.data.digits;
+
+
+            postMessage({
+
+                type:
+                    'start'
+
+            });
+
+
+            const value =
+                computePi(
+                    d
+                );
+
+
+            postMessage({
+
+                type:
+                    'done',
+
+                value
+
+            });
+
+        }
+
+        catch (error) {
+
+            postMessage({
+
+                type:
+                    'error',
+
+                message:
+                    error &&
+                    error.message
+                        ? error.message
+                        : String(error)
+
+            });
+
+        }
+
+    };
+
+`;
+
+
+
+/* =========================================
+   تحويل مباشر
+========================================= */
+
+function directConversion(
+    digits,
+    mapping
+) {
+
+    let output =
+        '';
+
+
+    for (
+        const digit of
+        digits
+    ) {
+
+        output +=
+            mapping[
+                Number(
+                    digit
+                )
+            ];
+
+    }
+
+
+    return output;
+
+}
+
+
+
+/* =========================================
+   كل رقمين → A-Z
+========================================= */
+
+function pairConversion(
+    digits
+) {
+
+    let output =
+        '';
+
+
+    for (
+        let i = 0;
+        i < digits.length;
+        i += 2
+    ) {
+
+        let pair =
+            digits.slice(
+                i,
+                i + 2
+            );
+
+
+        if (
+            pair.length === 1
+        ) {
+
+            pair =
+                '0' +
+                pair;
+
+        }
+
+
+        const number =
+            Number(
+                pair
+            );
+
+
+        const letterIndex =
+            number %
+            26;
+
+
+        output +=
+            String.fromCharCode(
+                65 +
+                letterIndex
+            );
+
+    }
+
+
+    return output;
+
+}
+
+
+
+/* =========================================
+   أرقام π
+========================================= */
+
+function getPiDigits() {
+
+    return originalPi.replace(
+        /\D/g,
+        ''
+    );
+
+}
+
+
+
+/* =========================================
+   تحويل π إلى أحرف
+========================================= */
+
+function convertPiToLetters() {
+
+    const digits =
+        getPiDigits();
+
+
+    const method =
+        $('conversionMethod')
+            .value;
+
+
+    if (
+        !digits
+    ) {
+
+        return '';
+
+    }
+
+
+    if (
+        method ===
+        'pairs'
+    ) {
+
+        return pairConversion(
+            digits
+        );
+
+    }
+
+
+    if (
+        method ===
+        'direct'
+    ) {
+
+        return directConversion(
+            digits,
+            'ABCDEFGHIJ'
+        );
+
+    }
+
+
+    if (
+        method ===
+        'custom'
+    ) {
+
+        const mapping =
+            Array.from(
+                $('customMapping')
+                    .value
+            );
+
+
+        if (
+            mapping.length !==
+            10
+        ) {
+
+            return null;
+
+        }
+
+
+        return directConversion(
+            digits,
+            mapping
+        );
+
+    }
+
+
+    return '';
+
+}
+
+
+
+/* =========================================
+   النص المعروض
+========================================= */
+
+function getDisplayedText() {
+
+    const mode =
+        $('displayMode')
+            .value;
+
+
+    if (
+        mode ===
+        'numbers'
+    ) {
+
+        return originalPi;
+
+    }
+
+
+    if (
+        mode ===
+        'letters'
+    ) {
+
+        const converted =
+            convertPiToLetters();
+
+
+        return converted ||
+            '';
+
+    }
+
+
+    return originalPi;
+
+}
+
+
+
+/* =========================================
+   واجهة البحث
+========================================= */
+
+function updateSearchInterface() {
+
+    const mode =
+        $('displayMode')
+            .value;
+
+
+    if (
+        mode ===
+        'numbers'
+    ) {
+
+        $('searchLabel')
+            .textContent =
+            '🔎 ابحث عن أي رقم داخل باي';
+
+
+        $('searchNumber')
+            .placeholder =
+            'مثلاً: 123456';
+
+
+        $('searchNumber')
+            .inputMode =
+            'numeric';
+
+
+        $('searchStatus')
+            .textContent =
+            'اكتب أي تسلسل أرقام للبحث عنه داخل الخانات المحسوبة.';
+
+
+        return;
+
+    }
+
+
+    if (
+        mode ===
+        'letters'
+    ) {
+
+        $('searchLabel')
+            .textContent =
+            '🔎 ابحث عن أي حرف داخل النتيجة';
+
+
+        $('searchNumber')
+            .placeholder =
+            'مثلاً: ABC';
+
+
+        $('searchNumber')
+            .inputMode =
+            'text';
+
+
+        $('searchStatus')
+            .textContent =
+            'اكتب أي تسلسل أحرف للبحث عنه داخل النتيجة المحولة.';
+
+
+        return;
+
+    }
+
+
+    if (
+        mode ===
+        'pixels'
+    ) {
+
+        $('searchLabel')
+            .textContent =
+            '🔎 ابحث عن أي رقم داخل البكسلات';
+
+
+        $('searchNumber')
+            .placeholder =
+            'مثلاً: 123456';
+
+
+        $('searchNumber')
+            .inputMode =
+            'numeric';
+
+
+        $('searchStatus')
+            .textContent =
+            'اكتب أي رقم للعثور عليه والقفز إلى مكانه داخل البكسلات.';
+
+    }
+
+}
+
+
+
+/* =========================================
+   تحديث العرض
+========================================= */
+
+function updateDisplay() {
+
+    const mode =
+        $('displayMode')
+            .value;
+
+
+    /*
+       أرقام
+    */
+
+    if (
+        mode ===
+        'numbers'
+    ) {
+
+        $('result')
+            .style.display =
+            'block';
+
+
+        $('pixelViewport')
+            .style.display =
+            'none';
+
+
+        $('pixelInfo')
+            .style.display =
+            'none';
+
+
+        $('shapeSearch')
+            .style.display =
+            'none';
+
+
+        $('conversionOptions')
+            .style.display =
+            'none';
+
+
+        $('customMappingBox')
+            .style.display =
+            'none';
+
+
+        $('result')
+            .textContent =
+            originalPi;
+
+
+        $('pixelMarker')
+            .style.display =
+            'none';
+
+
+        $('shapeMarker')
+            .style.display =
+            'none';
+
+
+        updateSearchInterface();
+
+
+        return;
+
+    }
+
+
+
+    /*
+       أحرف
+    */
+
+    if (
+        mode ===
+        'letters'
+    ) {
+
+        $('result')
+            .style.display =
+            'block';
+
+
+        $('pixelViewport')
+            .style.display =
+            'none';
+
+
+        $('pixelInfo')
+            .style.display =
+            'none';
+
+
+        $('shapeSearch')
+            .style.display =
+            'none';
+
+
+        $('conversionOptions')
+            .style.display =
+            'flex';
+
+
+        if (
+            $('conversionMethod')
+                .value ===
+            'custom'
+        ) {
+
+            $('customMappingBox')
+                .style.display =
+                'block';
+
+        }
+
+        else {
+
+            $('customMappingBox')
+                .style.display =
+                'none';
+
+        }
+
+
+        const converted =
+            convertPiToLetters();
+
+
+        if (
+            converted ===
+            null
+        ) {
+
+            $('result')
+                .textContent =
+                '❌ الترميز المخصص يحتاج إلى 10 أحرف بالضبط.';
+
+
+            updateSearchInterface();
+
+
+            return;
+
+        }
+
+
+        $('result')
+            .textContent =
+            converted;
+
+
+        $('pixelMarker')
+            .style.display =
+            'none';
+
+
+        $('shapeMarker')
+            .style.display =
+            'none';
+
+
+        updateSearchInterface();
+
+
+        return;
+
+    }
+
+
+
+    /*
+       بكسلات
+    */
+
+    if (
+        mode ===
+        'pixels'
+    ) {
+
+        $('result')
+            .style.display =
+            'none';
+
+
+        $('conversionOptions')
+            .style.display =
+            'none';
+
+
+        $('customMappingBox')
+            .style.display =
+            'none';
+
+
+        $('pixelViewport')
+            .style.display =
+            'block';
+
+
+        $('pixelInfo')
+            .style.display =
+            'block';
+
+
+        $('shapeSearch')
+            .style.display =
+            'block';
+
+
+        $('pixelMarker')
+            .style.display =
+            'none';
+
+
+        $('shapeMarker')
+            .style.display =
+            'none';
+
+
+        updateSearchInterface();
+
+
+        renderPixels();
+
+    }
+
+}
+
+
+
+/* =========================================
+   إنشاء شبكة 5×5
+========================================= */
+
+function createShapeGrid() {
+
+    const grid =
+        $('shapeGrid');
+
+
+    grid.innerHTML =
+        '';
+
+
+    shapeCells.length =
+        0;
+
+
+    for (
+        let i = 0;
+        i < SHAPE_SIZE *
+            SHAPE_SIZE;
+        i++
+    ) {
+
+        const cell =
+            document.createElement(
+                'div'
+            );
+
+
+        cell.className =
+            'shape-cell';
+
+
+        cell.dataset.index =
+            i;
+
+
+        cell.addEventListener(
+            'pointerdown',
+            event => {
+
+                event.preventDefault();
+
+
+                shapeDrawing =
+                    true;
+
+
+                shapeDrawValue =
+                    cell.classList
+                        .contains(
+                            'white'
+                        )
+                        ? 0
+                        : 1;
+
+
+                paintShapeCell(
+                    cell,
+                    shapeDrawValue
+                );
+
+
+                try {
+
+                    cell.setPointerCapture(
+                        event.pointerId
+                    );
+
+                }
+
+                catch (e) {}
+
+            }
+        );
+
+
+        cell.addEventListener(
+            'pointerenter',
+            () => {
+
+                if (
+                    !shapeDrawing
+                ) {
+
+                    return;
+
+                }
+
+
+                paintShapeCell(
+                    cell,
+                    shapeDrawValue
+                );
+
+            }
+        );
+
+
+        cell.addEventListener(
+            'pointermove',
+            () => {
+
+                if (
+                    !shapeDrawing
+                ) {
+
+                    return;
+
+                }
+
+
+                paintShapeCell(
+                    cell,
+                    shapeDrawValue
+                );
+
+            }
+        );
+
+
+        shapeCells.push(
+            cell
+        );
+
+
+        grid.appendChild(
+            cell
+        );
+
+    }
+
+}
+
+
+
+/* =========================================
+   إيقاف الرسم
+========================================= */
+
+window.addEventListener(
+    'pointerup',
+    () => {
+
+        shapeDrawing =
+            false;
+
+    }
+);
+
+
+
+/* =========================================
+   رسم خلية
+========================================= */
+
+function paintShapeCell(
+    cell,
+    value
+) {
+
+    if (
+        value === 1
+    ) {
+
+        cell.classList.add(
+            'white'
+        );
+
+    }
+
+    else {
+
+        cell.classList.remove(
+            'white'
+        );
+
+    }
+
+}
+
+
+
+/* =========================================
+   مسح الشكل
+========================================= */
+
+function clearShape() {
+
+    for (
+        const cell of
+        shapeCells
+    ) {
+
+        cell.classList.remove(
+            'white'
+        );
+
+    }
+
+
+    $('shapeStatus')
+        .textContent =
+        'ارسم الشكل الذي تريد البحث عنه.';
+
+
+    $('shapeMarker')
+        .style.display =
+        'none';
+
+}
+
+
+
+/* =========================================
+   رسم π كبكسلات
+========================================= */
+
+function renderPixels() {
+
+    const digits =
+        getPiDigits();
+
+
+    const canvas =
+        $('pixelCanvas');
+
+
+    const viewport =
+        $('pixelViewport');
+
+
+    pixelReady =
+        false;
+
+
+    pixelRenderToken++;
+
+
+    const token =
+        pixelRenderToken;
+
+
+    const PIXEL_SIZE =
+        16;
+
+
+    currentPixelSize =
+        PIXEL_SIZE;
+
+
+    if (
+        !digits
+    ) {
+
+        canvas.width =
+            1;
+
+
+        canvas.height =
+            1;
+
+
+        canvas.style.width =
+            PIXEL_SIZE +
+            'px';
+
+
+        canvas.style.height =
+            PIXEL_SIZE +
+            'px';
+
+
+        viewport.scrollLeft =
+            0;
+
+
+        viewport.scrollTop =
+            0;
+
+
+        pixelReady =
+            true;
+
+
+        return Promise.resolve();
+
+    }
+
+
+    pixelColumns =
+        Math.ceil(
+            Math.sqrt(
+                digits.length
+            )
+        );
+
+
+    pixelRows =
+        Math.ceil(
+            digits.length /
+            pixelColumns
+        );
+
+
+    if (
+        pixelColumns >
+        32767 ||
+        pixelRows >
+        32767
+    ) {
+
+        $('status')
+            .textContent =
+            'عدد البكسلات كبير جدًا لهذا المتصفح.';
+
+
+        return Promise.resolve();
+
+    }
+
+
+    canvas.width =
+        pixelColumns;
+
+
+    canvas.height =
+        pixelRows;
+
+
+    canvas.style.width =
+        (
+            pixelColumns *
+            PIXEL_SIZE
+        ) +
+        'px';
+
+
+    canvas.style.height =
+        (
+            pixelRows *
+            PIXEL_SIZE
+        ) +
+        'px';
+
+
+    const ctx =
+        canvas.getContext(
+            '2d'
+        );
+
+
+    ctx.imageSmoothingEnabled =
+        false;
+
+
+    const imageData =
+        ctx.createImageData(
+            pixelColumns,
+            pixelRows
+        );
+
+
+    const data =
+        imageData.data;
+
+
+    for (
+        let i = 0;
+        i < data.length;
+        i += 4
+    ) {
+
+        data[i] =
+            0;
+
+
+        data[i + 1] =
+            0;
+
+
+        data[i + 2] =
+            0;
+
+
+        data[i + 3] =
+            255;
+
+    }
+
+
+    const total =
+        digits.length;
+
+
+    const chunk =
+        100000;
+
+
+    let position =
+        0;
+
+
+    $('status')
+        .textContent =
+        'جارٍ تحويل π إلى بكسلات... 0%';
+
+
+    return new Promise(
+        resolve => {
+
+            function drawChunk() {
+
+                if (
+                    token !==
+                    pixelRenderToken
+                ) {
+
+                    resolve();
+
+
+                    return;
+
+                }
+
+
+                const end =
+                    Math.min(
+                        position +
+                        chunk,
+                        total
+                    );
+
+
+                for (
+                    let i =
+                        position;
+                    i < end;
+                    i++
+                ) {
+
+                    const digit =
+                        digits.charCodeAt(
+                            i
+                        ) -
+                        48;
+
+
+                    const pixel =
+                        i * 4;
+
+
+                    if (
+                        digit >= 5
+                    ) {
+
+                        data[pixel] =
+                            255;
+
+
+                        data[pixel + 1] =
+                            255;
+
+
+                        data[pixel + 2] =
+                            255;
+
+                    }
+
+                    else {
+
+                        data[pixel] =
+                            0;
+
+
+                        data[pixel + 1] =
+                            0;
+
+
+                        data[pixel + 2] =
+                            0;
+
+                    }
+
+
+                    data[pixel + 3] =
+                        255;
+
+                }
+
+
+                position =
+                    end;
+
+
+                const percent =
+                    Math.floor(
+                        (
+                            position /
+                            total
+                        ) *
+                        100
+                    );
+
+
+                $('status')
+                    .textContent =
+                    'جارٍ تحويل π إلى بكسلات... ' +
+                    percent +
+                    '%';
+
+
+                if (
+                    position <
+                    total
+                ) {
+
+                    setTimeout(
+                        drawChunk,
+                        0
+                    );
+
+
+                    return;
+
+                }
+
+
+                ctx.putImageData(
+                    imageData,
+                    0,
+                    0
+                );
+
+
+                pixelReady =
+                    true;
+
+
+                $('status')
+                    .textContent =
+                    'تم إنشاء البكسلات بنجاح ✓';
+
+
+                resolve();
+
+            }
+
+
+            drawChunk();
+
+        }
+    );
+
+}
+
+
+
+/* =========================================
+   عرض تطابق نصي
+========================================= */
+
+function showTextMatch(
+    text,
+    index,
+    length
+) {
+
+    const result =
+        $('result');
+
+
+    result.innerHTML =
+        '';
+
+
+    const before =
+        text.slice(
+            0,
+            index
+        );
+
+
+    const found =
+        text.slice(
+            index,
+            index +
+            length
+        );
+
+
+    const after =
+        text.slice(
+            index +
+            length
+        );
+
+
+    if (
+        before
+    ) {
+
+        result.appendChild(
+            document.createTextNode(
+                before
+            )
+        );
+
+    }
+
+
+    const mark =
+        document.createElement(
+            'mark'
+        );
+
+
+    mark.textContent =
+        found;
+
+
+    result.appendChild(
+        mark
+    );
+
+
+    if (
+        after
+    ) {
+
+        result.appendChild(
+            document.createTextNode(
+                after
+            )
+        );
+
+    }
+
+
+    requestAnimationFrame(
+        () => {
+
+            mark.scrollIntoView({
+
+                behavior:
+                    'smooth',
+
+                block:
+                    'center',
+
+                inline:
+                    'center'
+
+            });
+
+        }
+    );
+
+}
+
+
+
+/* =========================================
+   القفز إلى بكسل
+========================================= */
+
+function scrollToPixel(
+    digitIndex
+) {
+
+    if (
+        !pixelReady
+    ) {
+
+        return;
+
+    }
+
+
+    const viewport =
+        $('pixelViewport');
+
+
+    const marker =
+        $('pixelMarker');
+
+
+    const size =
+        currentPixelSize;
+
+
+    const x =
+        digitIndex %
+        pixelColumns;
+
+
+    const y =
+        Math.floor(
+            digitIndex /
+            pixelColumns
+        );
+
+
+    const screenX =
+        (
+            x *
+            size
+        ) +
+        size / 2;
+
+
+    const screenY =
+        (
+            y *
+            size
+        ) +
+        size / 2;
+
+
+    marker.style.left =
+        screenX +
+        'px';
+
+
+    marker.style.top =
+        screenY +
+        'px';
+
+
+    marker.style.width =
+        size +
+        'px';
+
+
+    marker.style.height =
+        size +
+        'px';
+
+
+    marker.style.display =
+        'block';
+
+
+    const targetLeft =
+        Math.max(
+            0,
+            screenX -
+            viewport.clientWidth /
+            2
+        );
+
+
+    const targetTop =
+        Math.max(
+            0,
+            screenY -
+            viewport.clientHeight /
+            2
+        );
+
+
+    viewport.scrollTo({
+
+        left:
+            targetLeft,
+
+        top:
+            targetTop,
+
+        behavior:
+            'smooth'
+
+    });
+
+}
+
+
+
+/* =========================================
+   القفز إلى الشكل
+========================================= */
+
+function scrollToShape(
+    x,
+    y,
+    width = 5,
+    height = 5
+) {
+
+    if (
+        !pixelReady
+    ) {
+
+        return;
+
+    }
+
+
+    const viewport =
+        $('pixelViewport');
+
+
+    const marker =
+        $('shapeMarker');
+
+
+    const size =
+        currentPixelSize;
+
+
+    const screenX =
+        (
+            x +
+            width / 2
+        ) *
+        size;
+
+
+    const screenY =
+        (
+            y +
+            height / 2
+        ) *
+        size;
+
+
+    marker.style.left =
+        screenX +
+        'px';
+
+
+    marker.style.top =
+        screenY +
+        'px';
+
+
+    marker.style.width =
+        (
+            width *
+            size
+        ) +
+        'px';
+
+
+    marker.style.height =
+        (
+            height *
+            size
+        ) +
+        'px';
+
+
+    marker.style.display =
+        'block';
+
+
+    const targetLeft =
+        Math.max(
+            0,
+            screenX -
+            viewport.clientWidth /
+            2
+        );
+
+
+    const targetTop =
+        Math.max(
+            0,
+            screenY -
+            viewport.clientHeight /
+            2
+        );
+
+
+    viewport.scrollTo({
+
+        left:
+            targetLeft,
+
+        top:
+            targetTop,
+
+        behavior:
+            'smooth'
+
+    });
+
+}
+
+
+
+/* =========================================
+   البحث عن أقرب شكل
+========================================= */
+
+async function searchCompactShape(
+    digits,
+    shape,
+    showProgress = true
+) {
+
+    const cols =
+        pixelColumns;
+
+
+    const rows =
+        pixelRows;
+
+
+    const width =
+        shape.width;
+
+
+    const height =
+        shape.height;
+
+
+    if (
+        width > cols ||
+        height > rows
+    ) {
+
+        return null;
+
+    }
+
+
+    const searchWidth =
+        cols -
+        width +
+        1;
+
+
+    if (
+        searchWidth <= 0
+    ) {
+
+        return null;
+
+    }
+
+
+    const area =
+        width *
+        height;
+
+
+    const targetWhite =
+        shape.whiteCount;
+
+
+    /*
+       صفوف الصورة.
+    */
+
+    const rowMasks =
+        new Array(
+            height
+        );
+
+
+    for (
+        let i = 0;
+        i < height;
+        i++
+    ) {
+
+        rowMasks[i] =
+            new Uint8Array(
+                searchWidth
+            );
+
+    }
+
+
+    let best =
+        null;
+
+
+    /*
+       مرور على كل صف.
+    */
+
+    for (
+        let y = 0;
+        y < rows;
+        y++
+    ) {
+
+        const slot =
+            y % height;
+
+
+        const rowMask =
+            rowMasks[
+                slot
+            ];
+
+
+        let rolling =
+            0;
+
+
+        const rowStart =
+            y *
+            cols;
+
+
+        /*
+           بناء النوافذ الأفقية.
+        */
+
+        for (
+            let x = 0;
+            x < cols;
+            x++
+        ) {
+
+            const index =
+                rowStart +
+                x;
+
+
+            let bit =
+                0;
+
+
+            if (
+                index <
+                digits.length
+            ) {
+
+                const digit =
+                    digits.charCodeAt(
+                        index
+                    ) -
+                    48;
+
+
+                bit =
+                    digit >= 5
+                        ? 1
+                        : 0;
+
+            }
+
+
+            rolling =
+                (
+                    (
+                        rolling <<
+                        1
+                    ) |
+                    bit
+                );
+
+
+            if (
+                width < 32
+            ) {
+
+                rolling &=
+                    (
+                        (
+                            1 <<
+                            width
+                        ) -
+                        1
+                    );
+
+            }
+
+
+            if (
+                x >=
+                width - 1
+            ) {
+
+                rowMask[
+                    x -
+                    (
+                        width - 1
+                    )
+                ] =
+                    rolling;
+
+            }
+
+        }
+
+
+        if (
+            y <
+            height - 1
+        ) {
+
+            continue;
+
+        }
+
+
+        /*
+           التحقق من كل نافذة.
+        */
+
+        for (
+            let x = 0;
+            x < searchWidth;
+            x++
+        ) {
+
+            const topY =
+                y -
+                height +
+                1;
+
+
+            const finalIndex =
+                (
+                    topY *
+                    cols
+                ) +
+                x +
+                (
+                    (
+                        height -
+                        1
+                    ) *
+                    cols
+                ) +
+                (
+                    width -
+                    1
+                );
+
+
+            if (
+                finalIndex >=
+                digits.length
+            ) {
+
+                continue;
+
+            }
+
+
+            /*
+               إنشاء Mask للنافذة.
+            */
+
+            let candidate =
+                0;
+
+
+            for (
+                let ry = 0;
+                ry < height;
+                ry++
+            ) {
+
+                const sourceRow =
+                    (
+                        topY +
+                        ry
+                    ) %
+                    height;
+
+
+                candidate =
+                    (
+                        candidate <<
+                        width
+                    ) |
+                    rowMasks[
+                        sourceRow
+                    ][x];
+
+            }
+
+
+            /*
+               =========================
+               القياسات التقليدية
+               =========================
+            */
+
+            const difference =
+                (
+                    candidate ^
+                    shape.mask
+                ) >>> 0;
+
+
+            const diffCount =
+                popcount(
+                    difference
+                );
+
+
+            const pixelScore =
+                1 -
+                (
+                    diffCount /
+                    area
+                );
+
+
+            const candidateWhite =
+                popcount(
+                    candidate
+                );
+
+
+            const intersection =
+                popcount(
+                    (
+                        candidate &
+                        shape.mask
+                    ) >>> 0
+                );
+
+
+            let diceScore =
+                0;
+
+
+            let jaccardScore =
+                0;
+
+
+            if (
+                targetWhite ===
+                0 &&
+                candidateWhite ===
+                0
+            ) {
+
+                diceScore =
+                    1;
+
+
+                jaccardScore =
+                    1;
+
+            }
+
+            else if (
+                targetWhite > 0 &&
+                candidateWhite > 0
+            ) {
+
+                diceScore =
+                    (
+                        2 *
+                        intersection
+                    ) /
+                    (
+                        targetWhite +
+                        candidateWhite
+                    );
+
+
+                const union =
+                    targetWhite +
+                    candidateWhite -
+                    intersection;
+
+
+                if (
+                    union > 0
+                ) {
+
+                    jaccardScore =
+                        intersection /
+                        union;
+
+                }
+
+            }
+
+
+            /*
+               =========================
+               تشابه مرن
+               =========================
+
+               نسمح للبكسل الأبيض أن
+               يكون قريبًا بكسلًا واحدًا
+               من مكانه، حتى لا ينخفض
+               التشابه بسبب انزياح بسيط.
+            */
+
+            let fuzzyDice =
+                0;
+
+
+            if (
+                targetWhite > 0 &&
+                candidateWhite > 0
+            ) {
+
+                const candidateDilated =
+                    dilateMask1(
+                        candidate,
+                        width,
+                        height
+                    );
+
+
+                const targetNear =
+                    popcount(
+                        (
+                            shape.mask &
+                            candidateDilated
+                        ) >>> 0
+                    );
+
+
+                const candidateNear =
+                    popcount(
+                        (
+                            candidate &
+                            shape.dilatedMask
+                        ) >>> 0
+                    );
+
+
+                const fuzzyPrecision =
+                    candidateNear /
+                    candidateWhite;
+
+
+                const fuzzyRecall =
+                    targetNear /
+                    targetWhite;
+
+
+                if (
+                    fuzzyPrecision +
+                    fuzzyRecall >
+                    0
+                ) {
+
+                    fuzzyDice =
+                        (
+                            2 *
+                            fuzzyPrecision *
+                            fuzzyRecall
+                        ) /
+                        (
+                            fuzzyPrecision +
+                            fuzzyRecall
+                        );
+
+                }
+
+            }
+
+            else if (
+                targetWhite === 0 &&
+                candidateWhite === 0
+            ) {
+
+                fuzzyDice =
+                    1;
+
+            }
+
+
+            /*
+               تشابه كثافة الشكل.
+            */
+
+            const densityScore =
+                Math.max(
+                    0,
+                    1 -
+                    (
+                        Math.abs(
+                            candidateWhite -
+                            targetWhite
+                        ) /
+                        Math.max(
+                            1,
+                            area
+                        )
+                    )
+                );
+
+
+            /*
+               =========================
+               الدرجة النهائية
+               =========================
+
+               35% تطابق أبيض مباشر
+               30% تشابه مرن
+               15% Jaccard
+               10% تطابق كل البكسلات
+               10% كثافة الشكل
+            */
+
+            const score =
+                (
+                    diceScore *
+                    0.35
+                ) +
+                (
+                    fuzzyDice *
+                    0.30
+                ) +
+                (
+                    jaccardScore *
+                    0.15
+                ) +
+                (
+                    pixelScore *
+                    0.10
+                ) +
+                (
+                    densityScore *
+                    0.10
+                );
+
+
+            /*
+               الاحتفاظ بأفضل نتيجة.
+            */
+
+            if (
+                !best ||
+                score >
+                best.score
+            ) {
+
+                best = {
+
+                    score,
+
+                    x,
+
+                    y:
+                        topY,
+
+                    width,
+
+                    height,
+
+                    diffCount,
+
+                    pixelScore,
+
+                    diceScore,
+
+                    jaccardScore,
+
+                    fuzzyDice,
+
+                    densityScore,
+
+                    candidateWhite,
+
+                    targetWhite
+
+                };
+
+
+                /*
+                   تطابق شبه مثالي.
+                */
+
+                if (
+                    score >=
+                    0.995
+                ) {
+
+                    return best;
+
+                }
+
+            }
+
+        }
+
+
+        /*
+           تحديث الواجهة.
+        */
+
+        if (
+            showProgress &&
+            y % 25 ===
+            0
+        ) {
+
+            const percent =
+                Math.floor(
+                    (
+                        y /
+                        Math.max(
+                            1,
+                            rows -
+                            height
+                        )
+                    ) *
+                    100
+                );
+
+
+            const currentScore =
+                best
+                    ? best.score *
+                      100
+                    : 0;
+
+
+            $('shapeStatus')
+                .textContent =
+                '🔎 جاري البحث عن أقرب شكل... ' +
+                percent +
+                '% • أفضل تشابه حاليًا ' +
+                currentScore.toFixed(
+                    0
+                ) +
+                '%';
+
+
+            await new Promise(
+                resolve =>
+                    setTimeout(
+                        resolve,
+                        0
+                    )
+            );
+
+        }
+
+    }
+
+
+    return best;
+
+}
+
+
+
+/* =========================================
+   البحث المحسن عن الشكل
+========================================= */
+
+async function findShape() {
+
+    const digits =
+        getPiDigits();
+
+
+    if (
+        !digits
+    ) {
+
+        $('shapeStatus')
+            .textContent =
+            '❌ احسب قيمة π أولًا.';
+
+        return;
+
+    }
+
+
+    /*
+       لا تسمح بالبحث عن شبكة
+       فارغة تمامًا.
+    */
+
+    const normalized =
+        getNormalizedShape();
+
+
+    if (
+        !normalized
+    ) {
+
+        $('shapeStatus')
+            .textContent =
+            '❌ ارسم بكسلًا أبيض واحدًا على الأقل أولًا.';
+
+        return;
+
+    }
+
+
+    /*
+       تحتاج الصورة إلى بكسلات
+       كافية.
+    */
+
+    if (
+        digits.length <
+        25
+    ) {
+
+        $('shapeStatus')
+            .textContent =
+            '❌ تحتاج إلى 25 بكسل على الأقل للبحث عن شكل 5×5.';
+
+        return;
+
+    }
+
+
+    /*
+       تجهيز البكسلات.
+    */
+
+    if (
+        !pixelReady
+    ) {
+
+        $('shapeStatus')
+            .textContent =
+            '⏳ جاري تجهيز البكسلات...';
+
+
+        await renderPixels();
+
+    }
+
+
+    /*
+       إنشاء كل النسخ:
+       دوران + انعكاس.
+    */
+
+    const variants =
+        getShapeVariants(
+            normalized
+        );
+
+
+    if (
+        !variants.length
+    ) {
+
+        $('shapeStatus')
+            .textContent =
+            '❌ تعذر تحليل الشكل.';
+
+        return;
+
+    }
+
+
+    $('shapeMarker')
+        .style.display =
+        'none';
+
+
+    /*
+       الأفضل على الإطلاق.
+    */
+
+    let best =
+        null;
+
+
+    let bestVariant =
+        null;
+
+
+    /*
+       نبحث في كل الاتجاهات.
+       هذا مهم لأننا لا نريد أن
+       تعتمد النتيجة على اتجاه الرسم.
+    */
+
+    for (
+        let i = 0;
+        i < variants.length;
+        i++
+    ) {
+
+        const variant =
+            variants[i];
+
+
+        $('shapeStatus')
+            .textContent =
+            '🔎 تحليل الشكل ' +
+            (
+                i + 1
+            ) +
+            ' من ' +
+            variants.length +
+            '...';
+
+
+        const result =
+            await searchCompactShape(
+                digits,
+                variant,
+                false
+            );
+
+
+        if (
+            !result
+        ) {
+
+            continue;
+
+        }
+
+
+        /*
+           نحتفظ بالأفضل.
+        */
+
+        if (
+            !best ||
+            result.score >
+            best.score
+        ) {
+
+            best =
+                result;
+
+
+            bestVariant =
+                variant;
+
+        }
+
+
+        /*
+           تطابق ممتاز جدًا.
+        */
+
+        if (
+            best.score >=
+            0.995
+        ) {
+
+            break;
+
+        }
+
+    }
+
+
+    /*
+       لا توجد نتيجة.
+    */
+
+    if (
+        !best ||
+        !bestVariant
+    ) {
+
+        $('shapeMarker')
+            .style.display =
+            'none';
+
+
+        $('shapeStatus')
+            .textContent =
+            '❌ لم يتم العثور على منطقة مناسبة للشكل.';
+
+
+        return;
+
+    }
+
+
+    /*
+       نسبة التشابه.
+    */
+
+    const similarity =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                best.score *
+                100
+            )
+        );
+
+
+    /*
+       موقع البكسل الأول.
+    */
+
+    const pixelIndex =
+        (
+            best.y *
+            pixelColumns
+        ) +
+        best.x;
+
+
+    /*
+       إخفاء مؤشر الرقم.
+    */
+
+    $('pixelMarker')
+        .style.display =
+        'none';
+
+
+    /*
+       رسم إطار الشكل.
+    */
+
+    scrollToShape(
+        best.x,
+        best.y,
+        best.width,
+        best.height
+    );
+
+
+    /*
+       الاتجاه.
+    */
+
+    const orientation =
+        bestVariant.name;
+
+
+    /*
+       الرسالة النهائية.
+    */
+
+    if (
+        similarity >=
+        99
+    ) {
+
+        $('shapeStatus')
+            .innerHTML =
+            '✅ <strong>تطابق ممتاز جدًا!</strong> ' +
+            'درجة التشابه <strong>' +
+            similarity.toFixed(
+                0
+            ) +
+            '%</strong>. ' +
+            'الاتجاه: <strong>' +
+            orientation +
+            '</strong>. ' +
+            'يبدأ عند البكسل رقم <strong>' +
+            (
+                pixelIndex +
+                1
+            ).toLocaleString(
+                'en-US'
+            ) +
+            '</strong>.';
+
+    }
+
+    else if (
+        similarity >=
+        90
+    ) {
+
+        $('shapeStatus')
+            .innerHTML =
+            '✅ <strong>وجدنا شكلًا مشابهًا جدًا!</strong> ' +
+            'درجة التشابه <strong>' +
+            similarity.toFixed(
+                0
+            ) +
+            '%</strong>. ' +
+            'الاتجاه: <strong>' +
+            orientation +
+            '</strong>. ' +
+            'يبدأ عند البكسل رقم <strong>' +
+            (
+                pixelIndex +
+                1
+            ).toLocaleString(
+                'en-US'
+            ) +
+            '</strong>.';
+
+    }
+
+    else if (
+        similarity >=
+        75
+    ) {
+
+        $('shapeStatus')
+            .innerHTML =
+            '✅ <strong>تم العثور على أقرب شكل جيد.</strong> ' +
+            'درجة التشابه <strong>' +
+            similarity.toFixed(
+                0
+            ) +
+            '%</strong>. ' +
+            'الاختلاف ' +
+            '<strong>' +
+            best.diffCount +
+            '</strong> بكسل مباشر، مع احتساب قرب البكسلات. ' +
+            'الاتجاه: <strong>' +
+            orientation +
+            '</strong>. ' +
+            'يبدأ عند البكسل رقم <strong>' +
+            (
+                pixelIndex +
+                1
+            ).toLocaleString(
+                'en-US'
+            ) +
+            '</strong>.';
+
+    }
+
+    else {
+
+        $('shapeStatus')
+            .innerHTML =
+            '✅ لم يوجد تطابق قوي جدًا، لكن هذا هو <strong>أقرب شكل تم العثور عليه</strong> ' +
+            'بدرجة تشابه <strong>' +
+            similarity.toFixed(
+                0
+            ) +
+            '%</strong>. ' +
+            'الاتجاه: <strong>' +
+            orientation +
+            '</strong>. ' +
+            'يبدأ عند البكسل رقم <strong>' +
+            (
+                pixelIndex +
+                1
+            ).toLocaleString(
+                'en-US'
+            ) +
+            '</strong>.';
+
+    }
+
+}
+
+
+
+/* =========================================
+   Escape HTML
+========================================= */
+
+function escapeHTML(
+    text
+) {
+
+    return text
+        .replace(
+            /&/g,
+            '&amp;'
+        )
+        .replace(
+            /</g,
+            '&lt;'
+        )
+        .replace(
+            />/g,
+            '&gt;'
+        )
+        .replace(
+            /"/g,
+            '&quot;'
+        )
+        .replace(
+            /'/g,
+            '&#039;'
+        );
+
+}
+
+
+
+/* =========================================
+   حساب π
+========================================= */
+
+$('calculate')
+    .addEventListener(
+        'click',
+        () => {
+
+            const d =
+                Number(
+                    $('digits')
+                        .value
+                );
+
+
+            if (
+                !Number.isInteger(d) ||
+                d < 1 ||
+                d > 10000000
+            ) {
+
+                $('status')
+                    .textContent =
+                    'أدخل عددًا صحيحًا بين 1 و10,000,000.';
+
+                return;
+
+            }
+
+
+            if (
+                piWorker
+            ) {
+
+                try {
+
+                    piWorker.terminate();
+
+                }
+
+                catch (e) {}
+
+
+                piWorker =
+                    null;
+
+            }
+
+
+            pixelRenderToken++;
+
+            pixelReady =
+                false;
+
+
+            $('calculate')
+                .disabled =
+                true;
+
+
+            $('status')
+                .textContent =
+                'جارٍ حساب π...';
+
+
+            $('searchNumber')
+                .value =
+                '';
+
+
+            $('searchStatus')
+                .textContent =
+                'جاري تجهيز النتيجة...';
+
+
+            $('shapeStatus')
+                .textContent =
+                'ارسم الشكل الذي تريد البحث عنه.';
+
+
+            $('shapeMarker')
+                .style.display =
+                'none';
+
+
+            const blob =
+                new Blob(
+                    [
+                        workerCode
+                    ],
+                    {
+                        type:
+                            'application/javascript'
+                    }
+                );
+
+
+            const workerUrl =
+                URL.createObjectURL(
+                    blob
+                );
+
+
+            piWorker =
+                new Worker(
+                    workerUrl
+                );
+
+
+            piWorker.onmessage =
+                function(event) {
+
+                    const data =
+                        event.data;
+
+
+                    if (
+                        data.type ===
+                        'start'
+                    ) {
+
+                        $('status')
+                            .textContent =
+                            'جارٍ الحساب...';
+
+
+                        return;
+
+                    }
+
+
+                    if (
+                        data.type ===
+                        'done'
+                    ) {
+
+                        originalPi =
+                            data.value;
+
+
+                        $('displayMode')
+                            .value =
+                            'numbers';
+
+
+                        $('conversionOptions')
+                            .style.display =
+                            'none';
+
+
+                        $('customMappingBox')
+                            .style.display =
+                            'none';
+
+
+                        $('result')
+                            .style.display =
+                            'block';
+
+
+                        $('pixelViewport')
+                            .style.display =
+                            'none';
+
+
+                        $('pixelInfo')
+                            .style.display =
+                            'none';
+
+
+                        $('shapeSearch')
+                            .style.display =
+                            'none';
+
+
+                        $('pixelMarker')
+                            .style.display =
+                            'none';
+
+
+                        $('shapeMarker')
+                            .style.display =
+                            'none';
+
+
+                        $('result')
+                            .textContent =
+                            originalPi;
+
+
+                        $('status')
+                            .textContent =
+                            'اكتمل الحساب بنجاح ✓';
+
+
+                        $('count')
+                            .textContent =
+                            d.toLocaleString(
+                                'en-US'
+                            ) +
+                            ' خانة';
+
+
+                        $('statDigits')
+                            .textContent =
+                            d.toLocaleString(
+                                'en-US'
+                            );
+
+
+                        $('searchStatus')
+                            .textContent =
+                            'اكتب رقمًا للبحث داخل الخانات المحسوبة.';
+
+
+                        updateSearchInterface();
+
+
+                        $('calculate')
+                            .disabled =
+                            false;
+
+
+                        try {
+
+                            piWorker.terminate();
+
+                        }
+
+                        catch (e) {}
+
+
+                        piWorker =
+                            null;
+
+
+                        URL.revokeObjectURL(
+                            workerUrl
+                        );
+
+
+                        return;
+
+                    }
+
+
+                    if (
+                        data.type ===
+                        'error'
+                    ) {
+
+                        console.error(
+                            data.message
+                        );
+
+
+                        $('status')
+                            .textContent =
+                            'حدث خطأ أثناء حساب π.';
+
+
+                        $('searchStatus')
+                            .textContent =
+                            data.message ||
+                            'خطأ غير معروف.';
+
+
+                        $('calculate')
+                            .disabled =
+                            false;
+
+
+                        try {
+
+                            piWorker.terminate();
+
+                        }
+
+                        catch (e) {}
+
+
+                        piWorker =
+                            null;
+
+
+                        URL.revokeObjectURL(
+                            workerUrl
+                        );
+
+                    }
+
+                };
+
+
+            piWorker.onerror =
+                function(error) {
+
+                    console.error(
+                        error
+                    );
+
+
+                    $('status')
+                        .textContent =
+                        'حدث خطأ أثناء الحساب.';
+
+
+                    $('searchStatus')
+                        .textContent =
+                        'تعذر تشغيل الحساب داخل المتصفح.';
+
+
+                    $('calculate')
+                        .disabled =
+                        false;
+
+
+                    try {
+
+                        piWorker.terminate();
+
+                    }
+
+                    catch (e) {}
+
+
+                    piWorker =
+                        null;
+
+
+                    URL.revokeObjectURL(
+                        workerUrl
+                    );
+
+                };
+
+
+            piWorker.postMessage({
+
+                digits:
+                    d
+
+            });
+
+        }
+    );
+
+
+
+/* =========================================
+   تبديل العرض
+========================================= */
+
+$('displayMode')
+    .addEventListener(
+        'change',
+        async () => {
+
+            $('searchNumber')
+                .value =
+                '';
+
+
+            $('pixelMarker')
+                .style.display =
+                'none';
+
+
+            $('shapeMarker')
+                .style.display =
+                'none';
+
+
+            updateDisplay();
+
+
+            if (
+                $('displayMode')
+                    .value ===
+                'pixels'
+            ) {
+
+                $('searchStatus')
+                    .textContent =
+                    'جاري تجهيز البكسلات...';
+
+
+                $('shapeStatus')
+                    .textContent =
+                    'جاري تجهيز البكسلات...';
+
+
+                await new Promise(
+                    resolve =>
+                        setTimeout(
+                            resolve,
+                            50
+                        )
+                );
+
+
+                if (
+                    pixelReady
+                ) {
+
+                    $('searchStatus')
+                        .textContent =
+                        'اكتب أي رقم للعثور عليه والقفز إلى مكانه داخل البكسلات.';
+
+
+                    $('shapeStatus')
+                        .textContent =
+                        'ارسم شكلًا 5×5 ثم ابحث عن أقرب شكل مشابه.';
+
+                }
+
+            }
+
+        }
+    );
+
+
+
+/* =========================================
+   تغيير طريقة التحويل
+========================================= */
+
+$('conversionMethod')
+    .addEventListener(
+        'change',
+        () => {
+
+            $('searchNumber')
+                .value =
+                '';
+
+
+            updateDisplay();
+
+        }
+    );
+
+
+
+/* =========================================
+   الترميز المخصص
+========================================= */
+
+$('customMapping')
+    .addEventListener(
+        'input',
+        () => {
+
+            let value =
+                $('customMapping')
+                    .value;
+
+
+            value =
+                Array.from(
+                    value
+                )
+                .slice(
+                    0,
+                    10
+                )
+                .join('');
+
+
+            $('customMapping')
+                .value =
+                value;
+
+
+            if (
+                $('displayMode')
+                    .value ===
+                'letters' &&
+                $('conversionMethod')
+                    .value ===
+                'custom'
+            ) {
+
+                $('searchNumber')
+                    .value =
+                    '';
+
+
+                updateDisplay();
+
+            }
+
+        }
+    );
+
+
+
+/* =========================================
+   البحث
+========================================= */
+
+$('searchBtn')
+    .addEventListener(
+        'click',
+        async () => {
+
+            const query =
+                $('searchNumber')
+                    .value
+                    .trim();
+
+
+            const status =
+                $('searchStatus');
+
+
+            const mode =
+                $('displayMode')
+                    .value;
+
+
+
+            /* =========================
+               أرقام
+            ========================= */
+
+            if (
+                mode ===
+                'numbers'
+            ) {
+
+                if (
+                    !/^\d+$/.test(
+                        query
+                    )
+                ) {
+
+                    status.textContent =
+                        '❌ اكتب أرقامًا فقط.';
+
+                    return;
+
+                }
+
+
+                const searchText =
+                    originalPi;
+
+
+                const index =
+                    searchText.indexOf(
+                        query
+                    );
+
+
+                if (
+                    index ===
+                    -1
+                ) {
+
+                    status.innerHTML =
+                        '❌ الرقم <strong>' +
+                        escapeHTML(
+                            query
+                        ) +
+                        '</strong> غير موجود ضمن الخانات المحسوبة حاليًا.';
+
+
+                    $('result')
+                        .textContent =
+                        searchText;
+
+
+                    return;
+
+                }
+
+
+                let occurrences =
+                    0;
+
+
+                let searchFrom =
+                    0;
+
+
+                while (true) {
+
+                    const foundAt =
+                        searchText.indexOf(
+                            query,
+                            searchFrom
+                        );
+
+
+                    if (
+                        foundAt ===
+                        -1
+                    ) {
+
+                        break;
+
+                    }
+
+
+                    occurrences++;
+
+
+                    searchFrom =
+                        foundAt +
+                        query.length;
+
+                }
+
+
+                const decimalPosition =
+                    index < 2
+                        ? 0
+                        : index - 1;
+
+
+                showTextMatch(
+                    searchText,
+                    index,
+                    query.length
+                );
+
+
+                status.innerHTML =
+                    '✅ تم العثور على <strong>' +
+                    escapeHTML(
+                        query
+                    ) +
+                    '</strong> ' +
+                    occurrences +
+                    ' مرة. ' +
+                    'أول ظهور يبدأ عند الخانة العشرية رقم ' +
+                    '<strong>' +
+                    decimalPosition +
+                    '</strong>.';
+
+
+                return;
+
+            }
+
+
+
+            /* =========================
+               أحرف
+            ========================= */
+
+            if (
+                mode ===
+                'letters'
+            ) {
+
+                if (
+                    !query
+                ) {
+
+                    status.textContent =
+                        '❌ اكتب أحرفًا للبحث عنها.';
+
+                    return;
+
+                }
+
+
+                const searchText =
+                    getDisplayedText();
+
+
+                if (
+                    !searchText
+                ) {
+
+                    status.textContent =
+                        '❌ لا توجد نتيجة محولة للبحث فيها.';
+
+                    return;
+
+                }
+
+
+                const searchableText =
+                    searchText.toUpperCase();
+
+
+                const searchableQuery =
+                    query.toUpperCase();
+
+
+                const index =
+                    searchableText.indexOf(
+                        searchableQuery
+                    );
+
+
+                if (
+                    index ===
+                    -1
+                ) {
+
+                    status.innerHTML =
+                        '❌ التسلسل <strong>' +
+                        escapeHTML(
+                            query
+                        ) +
+                        '</strong> غير موجود ضمن النتيجة الحالية.';
+
+
+                    $('result')
+                        .textContent =
+                        searchText;
+
+
+                    return;
+
+                }
+
+
+                let occurrences =
+                    0;
+
+
+                let searchFrom =
+                    0;
+
+
+                while (true) {
+
+                    const foundAt =
+                        searchableText.indexOf(
+                            searchableQuery,
+                            searchFrom
+                        );
+
+
+                    if (
+                        foundAt ===
+                        -1
+                    ) {
+
+                        break;
+
+                    }
+
+
+                    occurrences++;
+
+
+                    searchFrom =
+                        foundAt +
+                        searchableQuery.length;
+
+                }
+
+
+                showTextMatch(
+                    searchText,
+                    index,
+                    searchableQuery.length
+                );
+
+
+                status.innerHTML =
+                    '✅ تم العثور على <strong>' +
+                    escapeHTML(
+                        query
+                    ) +
+                    '</strong> ' +
+                    occurrences +
+                    ' مرة. ' +
+                    'أول ظهور يبدأ عند الحرف رقم ' +
+                    '<strong>' +
+                    (
+                        index +
+                        1
+                    ).toLocaleString(
+                        'en-US'
+                    ) +
+                    '</strong>.';
+
+
+                return;
+
+            }
+
+
+
+            /* =========================
+               بكسلات
+            ========================= */
+
+            if (
+                mode ===
+                'pixels'
+            ) {
+
+                if (
+                    !/^\d+$/.test(
+                        query
+                    )
+                ) {
+
+                    status.textContent =
+                        '❌ في وضع البكسلات اكتب أرقامًا فقط.';
+
+                    return;
+
+                }
+
+
+                const searchText =
+                    originalPi;
+
+
+                const index =
+                    searchText.indexOf(
+                        query
+                    );
+
+
+                if (
+                    index ===
+                    -1
+                ) {
+
+                    status.innerHTML =
+                        '❌ الرقم <strong>' +
+                        escapeHTML(
+                            query
+                        ) +
+                        '</strong> غير موجود ضمن π المحسوبة حاليًا.';
+
+
+                    $('pixelMarker')
+                        .style.display =
+                        'none';
+
+
+                    return;
+
+                }
+
+
+                let occurrences =
+                    0;
+
+
+                let searchFrom =
+                    0;
+
+
+                while (true) {
+
+                    const foundAt =
+                        searchText.indexOf(
+                            query,
+                            searchFrom
+                        );
+
+
+                    if (
+                        foundAt ===
+                        -1
+                    ) {
+
+                        break;
+
+                    }
+
+
+                    occurrences++;
+
+
+                    searchFrom =
+                        foundAt +
+                        query.length;
+
+                }
+
+
+                const digitsBefore =
+                    searchText
+                        .slice(
+                            0,
+                            index
+                        )
+                        .replace(
+                            /\D/g,
+                            ''
+                        )
+                        .length;
+
+
+                if (
+                    !pixelReady
+                ) {
+
+                    status.textContent =
+                        '⏳ جاري تجهيز البكسلات...';
+
+
+                    await renderPixels();
+
+                }
+
+
+                $('shapeMarker')
+                    .style.display =
+                    'none';
+
+
+                scrollToPixel(
+                    digitsBefore
+                );
+
+
+                status.innerHTML =
+                    '✅ تم العثور على <strong>' +
+                    escapeHTML(
+                        query
+                    ) +
+                    '</strong> ' +
+                    occurrences +
+                    ' مرة. ' +
+                    'تم الانتقال إلى أول ظهور داخل البكسلات.';
+
+            }
+
+        }
+    );
+
+
+
+/* =========================================
+   أزرار الشكل
+========================================= */
+
+$('findShapeBtn')
+    .addEventListener(
+        'click',
+        () => {
+
+            findShape();
+
+        }
+    );
+
+
+$('clearShapeBtn')
+    .addEventListener(
+        'click',
+        () => {
+
+            clearShape();
+
+        }
+    );
+
+
+
+/* =========================================
+   Enter
+========================================= */
+
+$('searchNumber')
+    .addEventListener(
+        'keydown',
+        event => {
+
+            if (
+                event.key ===
+                'Enter'
+            ) {
+
+                $('searchBtn')
+                    .click();
+
+            }
+
+        }
+    );
+
+
+
+/* =========================================
+   نسخ النتيجة
+========================================= */
+
+$('copy')
+    .addEventListener(
+        'click',
+        async () => {
+
+            let text;
+
+
+            if (
+                $('displayMode')
+                    .value ===
+                'pixels'
+            ) {
+
+                text =
+                    originalPi;
+
+            }
+
+            else {
+
+                text =
+                    $('result')
+                        .textContent;
+
+            }
+
+
+            if (
+                !text
+            ) {
+
+                $('copy')
+                    .textContent =
+                    'لا توجد نتيجة';
+
+
+                setTimeout(
+                    () => {
+
+                        $('copy')
+                            .textContent =
+                            'نسخ النتيجة';
+
+                    },
+                    1500
+                );
+
+
+                return;
+
+            }
+
+
+            try {
+
+                await navigator
+                    .clipboard
+                    .writeText(
+                        text
+                    );
+
+
+                $('copy')
+                    .textContent =
+                    'تم النسخ ✓';
+
+            }
+
+            catch (error) {
+
+                const temp =
+                    document.createElement(
+                        'textarea'
+                    );
+
+
+                temp.value =
+                    text;
+
+
+                temp.style.position =
+                    'fixed';
+
+
+                temp.style.opacity =
+                    '0';
+
+
+                document.body
+                    .appendChild(
+                        temp
+                    );
+
+
+                temp.focus();
+
+                temp.select();
+
+
+                try {
+
+                    document.execCommand(
+                        'copy'
+                    );
+
+
+                    $('copy')
+                        .textContent =
+                        'تم النسخ ✓';
+
+                }
+
+                catch (e) {
+
+                    $('copy')
+                        .textContent =
+                        'حدد النص للنسخ';
+
+                }
+
+
+                temp.remove();
+
+            }
+
+
+            setTimeout(
+                () => {
+
+                    $('copy')
+                        .textContent =
+                        'نسخ النتيجة';
+
+                },
+                1800
+            );
+
+        }
+    );
+
+
+
+/* =========================================
+   مسح
+========================================= */
+
+$('clear')
+    .addEventListener(
+        'click',
+        () => {
+
+            if (
+                piWorker
+            ) {
+
+                try {
+
+                    piWorker.terminate();
+
+                }
+
+                catch (e) {}
+
+
+                piWorker =
+                    null;
+
+            }
+
+
+            pixelRenderToken++;
+
+            pixelReady =
+                false;
+
+
+            originalPi =
+                '';
+
+
+            $('result')
+                .textContent =
+                '';
+
+
+            $('result')
+                .style.display =
+                'block';
+
+
+            $('pixelViewport')
+                .style.display =
+                'none';
+
+
+            $('pixelInfo')
+                .style.display =
+                'none';
+
+
+            $('shapeSearch')
+                .style.display =
+                'none';
+
+
+            $('pixelMarker')
+                .style.display =
+                'none';
+
+
+            $('shapeMarker')
+                .style.display =
+                'none';
+
+
+            $('status')
+                .textContent =
+                'تم مسح النتيجة';
+
+
+            $('count')
+                .textContent =
+                '—';
+
+
+            $('statDigits')
+                .textContent =
+                '0';
+
+
+            $('searchNumber')
+                .value =
+                '';
+
+
+            $('searchStatus')
+                .textContent =
+                'اكتب أي تسلسل للبحث عنه.';
+
+
+            $('displayMode')
+                .value =
+                'numbers';
+
+
+            $('conversionOptions')
+                .style.display =
+                'none';
+
+
+            $('customMappingBox')
+                .style.display =
+                'none';
+
+
+            $('calculate')
+                .disabled =
+                false;
+
+
+            clearShape();
+
+
+            const canvas =
+                $('pixelCanvas');
+
+
+            canvas.width =
+                1;
+
+
+            canvas.height =
+                1;
+
+
+            canvas.style.width =
+                currentPixelSize +
+                'px';
+
+
+            canvas.style.height =
+                currentPixelSize +
+                'px';
+
+
+            updateSearchInterface();
+
+        }
+    );
+
+
+
+/* =========================================
+   إنشاء شبكة الرسم
+========================================= */
+
+createShapeGrid();
+
+$('shapeGrid').addEventListener('pointermove', event => {
+    if (!shapeDrawing) return;
+    const el = document.elementFromPoint(event.clientX, event.clientY);
+    if (el && el.classList.contains('shape-cell')) {
+        paintShapeCell(el, shapeDrawValue);
+    }
+});
+
+window.addEventListener('pointercancel', () => {
+    shapeDrawing = false;
+});
+
+$('digits').addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+        $('calculate').click();
+    }
+});
+
+
+
+/* =========================================
+   التشغيل الأول
+========================================= */
+
+$('conversionOptions')
+    .style.display =
+    'none';
+
+
+$('pixelViewport')
+    .style.display =
+    'none';
+
+
+$('pixelInfo')
+    .style.display =
+    'none';
+
+
+$('shapeSearch')
+    .style.display =
+    'none';
+
+
+$('result')
+    .style.display =
+    'block';
+
+
+updateSearchInterface();
+
+</script>
+
+</body>
+</html>
